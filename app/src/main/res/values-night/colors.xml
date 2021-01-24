@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="TextTitle">#fff</color>
+    <color name="buttoncolor">#00adb5</color>
+    <color name="textbutton">#000</color>
+    <color name="texttime">#fff</color>
+</resources>
