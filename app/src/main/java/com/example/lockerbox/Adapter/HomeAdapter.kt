@@ -42,6 +42,7 @@ class HomeAdapter(private var boxList: List<LockerBox>): RecyclerView.Adapter<Ho
 //                }
                 NoBox.text = boxResponse.noBox.toString()
                 CodeLocker.text = boxResponse.codeLocker.toString()
+                duration_time.text = boxResponse.duration.toString() + " Jam"
             }
         }
     }

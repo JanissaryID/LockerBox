@@ -38,7 +38,7 @@
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="118dp"
         android:layout_height="46dp"
-        android:text="Rent Now"
+        android:text="Pilih"
         app:cornerRadius="6dp"
         android:backgroundTint="@color/topbar"
         android:textColor="@color/textbutton"

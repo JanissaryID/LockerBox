@@ -195,7 +195,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
         button_open = data.TimeOut!!
         mDialogView.NumberBox.setText(data.noBox.toString())
         mDialogView.InputPasswordHome.setText(data.password)
-        mDialogView.InputDurationHome.setText(data.duration.toString() + " Hour")
+        mDialogView.InputDurationHome.setText(data.duration.toString() + " Jam")
         ButtonsUpdate(mDialogView)
         onStartState(mDialogView)
         Log.d("CREATION", "TimeOut  " + data.TimeOut.toString())

@@ -113,7 +113,7 @@ class ResponseLockerFragment : Fragment() {
 
         mDialogView.NumberBox.setText(data.noBox.toString())
 
-        var HoursList = arrayOf("1 Hour", "2 Hour", "3 Hour", "4 Hour")
+        var HoursList = arrayOf("1 Jam", "2 Jam", "3 Jam", "4 Jam")
 
         var adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, HoursList)
         mDialogView.autoCompleteText.threshold = 0
