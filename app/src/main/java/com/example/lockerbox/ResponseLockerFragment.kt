@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,21 +36,6 @@ class ResponseLockerFragment : Fragment() {
     private val args : ResponseLockerFragmentArgs by navArgs()
     private val list = ArrayList<ResponseAPI>()
 
-//    companion object{
-//        lateinit var mLockerBoxViewModel : LockerBoxViewModel
-//    }
-
-    private val time15menit = 900000L
-
-    private val time50menit = 3000000L
-
-    var myService: LockerService? = null
-    var isBound = false
-
-    var handler: Handler = Handler()
-    lateinit var runnable: Runnable
-
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -71,9 +57,9 @@ class ResponseLockerFragment : Fragment() {
         rvBoxPost.setHasFixedSize(true)
         rvBoxPost.layoutManager = GridLayoutManager(requireContext(), 2)
 
-        RetrofitClient.instance.getBoxLocker(args.CodeLocker).enqueue(object : Callback<ArrayList<ResponseAPI>> {
-            override fun onResponse(call: Call<ArrayList<ResponseAPI>>, response: Response<ArrayList<ResponseAPI>>) {
-                val responseCode = response.code().toString() + "   " + args.CodeLocker
+        RetrofitClient.instance.getBoxLocker(args.CodeLocker).enqueue(object : Callback<List<ResponseAPI>> {
+            override fun onResponse(call: Call<List<ResponseAPI>>, response: Response<List<ResponseAPI>>) {
+//                val responseCode = response.code().toString() + "   " + args.CodeLocker
 //                tvResponseCode.text = responseCode
                 tvResponseCode.text = "Loker ${args.CodeLocker}"
                 response.body()?.let { list.addAll(it) }
@@ -97,8 +83,11 @@ class ResponseLockerFragment : Fragment() {
 
             }
 
-            override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
-                TODO("Not yet implemented")
+            override fun onFailure(call: Call<List<ResponseAPI>>, t: Throwable) {
+                Log.d("p2", t.message.toString())
+                if (t.message == t.message){
+                    Toast.makeText(requireContext(), "Tidak ada koneksi Internet" , Toast.LENGTH_SHORT).show()
+                }
             }
 
         })
@@ -144,12 +133,12 @@ class ResponseLockerFragment : Fragment() {
             }
 
             if(showerror){
-                updateBox(data, password, duration.subSequence(0, 1).toString().toInt())
-                insertDataToDB(data, password, duration.subSequence(0, 1).toString().toInt())
-                val time = duration.subSequence(0, 1).toString().toInt()
-                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + password + " dan " + duration, Toast.LENGTH_SHORT).show()
-                startService(time, data.noBox!!)
-                mAlertDialog.dismiss()
+                updateBox(data, password, duration.subSequence(0, 1).toString().toInt(), mAlertDialog)
+//                insertDataToDB(data, password, duration.subSequence(0, 1).toString().toInt())
+//                val time = duration.subSequence(0, 1).toString().toInt()
+//                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + password + " dan " + duration, Toast.LENGTH_SHORT).show()
+//                startService(time, data.noBox!!)
+//                mAlertDialog.dismiss()
             }
         }
     }
@@ -190,7 +179,7 @@ class ResponseLockerFragment : Fragment() {
         return !(TextUtils.isEmpty(Password) || TextUtils.isEmpty(Time))
     }
 
-    private fun updateBox(data: ResponseAPI, datapassword: String, dataduration: Int){
+    private fun updateBox(data: ResponseAPI, datapassword: String, dataduration: Int, mAlertDialog: AlertDialog){
         RetrofitClient.instance.patchBoxLocker(
                 data.id!!,
                 null,
@@ -199,16 +188,22 @@ class ResponseLockerFragment : Fragment() {
                 dataduration,
                 true,
                 null
-        ).enqueue(object : Callback<ArrayList<ResponseAPI>> {
-            override fun onResponse(call: Call<ArrayList<ResponseAPI>>, response: Response<ArrayList<ResponseAPI>>) {
-
-//                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + datapassword + " dan " + dataduration, Toast.LENGTH_SHORT).show()
+        ).enqueue(object : Callback<ResponseAPI> {
+            override fun onResponse(call: Call<ResponseAPI>, response: Response<ResponseAPI>) {
+                Log.d("p2", response.body().toString())
+                insertDataToDB(data, datapassword, dataduration)
+                val time = dataduration
+                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + datapassword + " dan " + dataduration, Toast.LENGTH_SHORT).show()
+                startService(time, data.noBox!!)
+                mAlertDialog.dismiss()
             }
 
-            override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
-//                Toast.makeText(requireContext(), "Kamu gagal memasukkan " + datapassword + " dan " + dataduration, Toast.LENGTH_SHORT).show()
+            override fun onFailure(call: Call<ResponseAPI>, t: Throwable) {
+                Log.d("p2", t.message.toString())
+                if (t.message == t.message){
+                    Toast.makeText(requireContext(), "Tidak ada koneksi Internet" , Toast.LENGTH_SHORT).show()
+                }
             }
-
         })
     }
 

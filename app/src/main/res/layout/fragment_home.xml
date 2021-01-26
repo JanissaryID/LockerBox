@@ -10,7 +10,6 @@
 
     <!-- TODO: Update blank fragment layout -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/LockerBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="26sp"
@@ -60,7 +59,6 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

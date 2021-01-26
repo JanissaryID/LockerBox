@@ -30,11 +30,9 @@ class LockerService: Service() {
         var end_time : Long = 0L
         var isRunning: Boolean = false
         var isaddTime: Boolean = false
-        var endTimer: Boolean = false
         var notifadd15: Boolean = false
         var id_notification: Int = 0
 
-        var foregroundVar : Boolean = false
 
         val ACTION_START_FOREGROUND_SERVICE = "ACTION_START_FOREGROUND_SERVICE"
 
@@ -100,7 +98,7 @@ class LockerService: Service() {
                 App.time_in_milli_seconds = p0
                 App.lastTime = p0
 
-                var (H, M, S) = TimeUpdateText()
+                val (H, M, S) = TimeUpdateText()
 
                 notification.setContentText("Sisa Waktu $H:$M:$S")
                 notificationManager.notify(id_notification, notification.build())
@@ -174,16 +172,16 @@ class LockerService: Service() {
     }
 
     fun TimeUpdateText(): Triple<Int, Int, Int>{
-        var Hour = (App.time_in_milli_seconds/3600000).toInt()
-        var Minute = ((App.time_in_milli_seconds/60000)%60).toInt()
-        var Second = ((App.time_in_milli_seconds/1000)%60).toInt()
+        val Hour = (App.time_in_milli_seconds/3600000).toInt()
+        val Minute = ((App.time_in_milli_seconds/60000)%60).toInt()
+        val Second = ((App.time_in_milli_seconds/1000)%60).toInt()
 
-        var intentVar = Intent(this, BroadcastReceiver::class.java)
-        var IntentBroadcast = PendingIntent.getBroadcast(applicationContext, 100, intentVar, 0)
+        val intentVar = Intent(this, BroadcastReceiver::class.java)
+        val IntentBroadcast = PendingIntent.getBroadcast(applicationContext, 100, intentVar, 0)
 
 
         if (Minute == 14 && !isaddTime && !notifadd15){
-            notificationtime15(Second)
+            notificationtime15()
             notifadd15 = true
             notification.addAction(
                     R.drawable.ic_dialogicon,
@@ -202,7 +200,7 @@ class LockerService: Service() {
         return Triple(Hour, Minute, Second)
     }
 
-    fun notificationtime15(lesstime: Int){
+    fun notificationtime15(){
         val builder = NotificationCompat.Builder(this, App.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_dialogicon)
                 .setContentTitle("Peringatan Waktu Peminjaman")

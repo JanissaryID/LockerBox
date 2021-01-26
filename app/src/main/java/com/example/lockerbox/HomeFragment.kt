@@ -2,8 +2,6 @@ package com.example.lockerbox
 
 import android.Manifest
 import android.app.AlertDialog
-import android.app.Service
-import android.content.ContentValues.TAG
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
@@ -15,18 +13,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lockerbox.Adapter.HomeAdapter
-import com.example.lockerbox.Adapter.LockerAdapter
 import com.example.lockerbox.Room.LockerBox
 import com.example.lockerbox.Room.LockerBoxViewModel
-import com.example.lockerbox.Services.App
-import com.example.lockerbox.Services.BroadcastReceiver
 import com.example.lockerbox.Services.LockerService
 import com.example.lockerbox.api.ResponseAPI
 import com.example.lockerbox.api.RetrofitClient
@@ -34,7 +27,6 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.custom_dialog.*
 import kotlinx.android.synthetic.main.custom_dialog.view.*
-import kotlinx.android.synthetic.main.custom_dialog.view.InputPassword
 import kotlinx.android.synthetic.main.custom_dialog.view.NumberBox
 import kotlinx.android.synthetic.main.custom_dialog_home.*
 import kotlinx.android.synthetic.main.custom_dialog_home.view.*
@@ -68,28 +60,6 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
 //        var button_stat : Boolean = false
         var button_open : Boolean = false
-
-        fun finishRentBoxService(data: LockerBox){
-            RetrofitClient.instance.putBoxLocker(
-                    data.idBox!!,
-                    data.codeLocker,
-                    data.noBox,
-                    null, //nanti di clear password jangan lupa!!
-                    0,
-                    true,
-                    false
-            ).enqueue(object : Callback<ArrayList<ResponseAPI>>{
-                override fun onResponse(call: Call<ArrayList<ResponseAPI>>, response: Response<ArrayList<ResponseAPI>>) {
-
-//                    Toast.makeText(requireContext(), "Kamu gagal menselesaikan peminjaman Box nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
-//                    Toast.makeText(requireContext(), "Kamu sukses menselesaikan peminjaman Box nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
-                }
-
-            })
-        }
     }
 
     override fun onCreateView(
@@ -210,8 +180,8 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
 //            Toast.makeText(requireContext(), "Kamu sukses memasukkan " + password + " dan " + duration , Toast.LENGTH_SHORT).show()
 
-            RetrofitClient.instance.getIdPassword(data.idBox,password).enqueue(object : Callback<ArrayList<ResponseAPI>> {
-                override fun onResponse(call: Call<ArrayList<ResponseAPI>>, response: Response<ArrayList<ResponseAPI>>) {
+            RetrofitClient.instance.getIdPassword(data.idBox,password).enqueue(object : Callback<List<ResponseAPI>> {
+                override fun onResponse(call: Call<List<ResponseAPI>>, response: Response<List<ResponseAPI>>) {
                     list.clear()
                     response.body()?.let { list.addAll(it) }
                     if (list.size == 0){
@@ -224,27 +194,24 @@ class HomeFragment : Fragment(), View.OnClickListener {
                         }
                     }
                     else{
-                        openDoorBox(data)
-                        mAlertDialog.dismiss()
+                        openDoorBox(data, mAlertDialog)
+//                        mAlertDialog.dismiss()
                     }
 
                 }
 
-                override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
-                    TODO("Not yet implemented")
+                override fun onFailure(call: Call<List<ResponseAPI>>, t: Throwable) {
+                    Log.d("p2", t.message.toString())
+                    if (t.message == t.message){
+                        Toast.makeText(requireContext(), "Tidak ada koneksi Internet" , Toast.LENGTH_SHORT).show()
+                    }
                 }
 
             })
         }
 
         mDialogView.ButtonEnd.setOnClickListener {
-            if(LockerService.isRunning){
-                Log.d("p2", button_open.toString())
-                FinishRent()
-            }
             finishRentBox(data, mAlertDialog)
-//            mAlertDialog.dismiss()
-//            button_stat = false
         }
     }
 
@@ -293,7 +260,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
     }
 
     private fun UpdateTextCount(mDialogView: View) {
-        var second = ((time_in_milli_seconds/1000)%60).toInt()
+        val second = ((time_in_milli_seconds/1000)%60).toInt()
 
         mDialogView.textTimerWrongPassword.text = "Tunggu $second detik untuk memasukkan password lagi"
     }
@@ -345,7 +312,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun openDoorBox(data: LockerBox){
+    private fun openDoorBox(data: LockerBox, mAlertDialog: AlertDialog){
         RetrofitClient.instance.patchBoxLocker(
                 data.idBox!!,
                 null,
@@ -354,18 +321,23 @@ class HomeFragment : Fragment(), View.OnClickListener {
                 null,
                 null,
                 true
-        ).enqueue(object : Callback<ArrayList<ResponseAPI>>{
-            override fun onResponse(call: Call<ArrayList<ResponseAPI>>, response: Response<ArrayList<ResponseAPI>>) {
-
-                Toast.makeText(requireContext(), "Kamu gagal membuka pintu nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+        ).enqueue(object : Callback<ResponseAPI>{
+            override fun onResponse(call: Call<ResponseAPI>, response: Response<ResponseAPI>) {
+                Toast.makeText(requireContext(), "Kamu sukses membuka pintu nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+                mAlertDialog.dismiss()
             }
 
-            override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
-                Toast.makeText(requireContext(), "Kamu sukses membuka pintu nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+            override fun onFailure(call: Call<ResponseAPI>, t: Throwable) {
+                Toast.makeText(requireContext(), "Kamu gagal membuka pintu nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+                Log.d("p2", t.message.toString())
+                if (t.message == t.message){
+                    Toast.makeText(requireContext(), "Tidak ada koneksi Internet" , Toast.LENGTH_SHORT).show()
+                }
             }
 
         })
     }
+
 
     private fun finishRentBox(data: LockerBox, mAlertDialog: AlertDialog){
         RetrofitClient.instance.putBoxLocker(
@@ -376,18 +348,23 @@ class HomeFragment : Fragment(), View.OnClickListener {
                 0,
                 false,
                 false
-        ).enqueue(object : Callback<ArrayList<ResponseAPI>>{
-            override fun onResponse(call: Call<ArrayList<ResponseAPI>>, response: Response<ArrayList<ResponseAPI>>) {
-
-                Toast.makeText(requireContext(), "Kamu gagal menselesaikan peminjaman Box nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
+        ).enqueue(object : Callback<ResponseAPI>{
+            override fun onResponse(call: Call<ResponseAPI>, response: Response<ResponseAPI>) {
+                Log.d("p2", response.body().toString())
+                if(LockerService.isRunning){
+                    Log.d("p2", button_open.toString())
+                    FinishRent()
+                }
                 deleteBox(data)
-                Toast.makeText(requireContext(), "Kamu sukses menselesaikan peminjaman Box nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
                 mAlertDialog.dismiss()
             }
 
+            override fun onFailure(call: Call<ResponseAPI>, t: Throwable) {
+                Log.d("p2", t.message.toString())
+                if (t.message == t.message){
+                    Toast.makeText(requireContext(), "Tidak ada koneksi Internet" , Toast.LENGTH_SHORT).show()
+                }
+            }
         })
     }
 

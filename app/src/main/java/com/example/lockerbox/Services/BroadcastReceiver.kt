@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.lockerbox.HomeFragment
-import com.example.lockerbox.MainActivity
 
 class BroadcastReceiver: BroadcastReceiver() {
 
@@ -14,7 +13,7 @@ class BroadcastReceiver: BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
         LockerService.isaddTime = true
         LockerService.isRunning = false
-        var time = 1
+        val time = 1
         LockerService.notificationManager.cancel(2)
         LockerService.countDownTimer.cancel()
 //        App.time_in_milli_seconds = App.lastTime + time*30000L
@@ -25,10 +24,10 @@ class BroadcastReceiver: BroadcastReceiver() {
         Log.d("p1", "Time after add " + App.afterAddTime.toString())
 
         stopService(p0!!)
-        startService(p0!!)
+        startService(p0)
     }
 
-    fun startService(context: Context){
+    private fun startService(context: Context){
         HomeFragment.serviceIntent = Intent(context, LockerService::class.java)
         HomeFragment.serviceIntent.putExtra("EXTRA_TIME", App.afterAddTime.toString())
         HomeFragment.serviceIntent.putExtra("EXTRA_ID", App.noBox.toString())
@@ -37,7 +36,7 @@ class BroadcastReceiver: BroadcastReceiver() {
         Log.d("p2", "Start Service")
     }
 
-    fun stopService(context: Context){
+    private fun stopService(context: Context){
         HomeFragment.serviceIntent = Intent(context, LockerService::class.java)
         context.stopService(HomeFragment.serviceIntent)
     }

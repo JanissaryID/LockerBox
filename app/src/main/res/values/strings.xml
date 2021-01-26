@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">LockerBox</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="String_text_36">36</string>
     <string name="password_hint">Password</string>
     <string name="select_duration_hint">Pilih Durasi</string>

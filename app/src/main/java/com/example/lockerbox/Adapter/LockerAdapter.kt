@@ -8,9 +8,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lockerbox.R
 import com.example.lockerbox.api.ResponseAPI
-import kotlinx.android.synthetic.main.fragment_response_locker.view.*
 import kotlinx.android.synthetic.main.item_box.view.*
-import kotlinx.android.synthetic.main.listapi.view.*
 
 class LockerAdapter(private val listBox: ArrayList<ResponseAPI>) : RecyclerView.Adapter<LockerAdapter.ListViewHolder>() {
 

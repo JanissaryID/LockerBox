@@ -4,20 +4,15 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface Api {
-    @GET("posts")
-    fun getpost(): Call<ArrayList<ResponseCoba>>
 
     @GET("lb")
-    fun getBoxAll(): Call<ArrayList<ResponseAPI>>
-
-    @GET("lb")
-    fun getBoxLocker(@Query("CodeLocker") CodeLocker : String ): Call<ArrayList<ResponseAPI>>
+    fun getBoxLocker(@Query("CodeLocker") CodeLocker : String ): Call<List<ResponseAPI>>
 
     @GET("lb/find")
     fun getIdPassword(
         @Query("id") NoBox: Int?,
         @Query("Password") Password: String?
-    ): Call<ArrayList<ResponseAPI>>
+    ): Call<List<ResponseAPI>>
 
     @FormUrlEncoded
 //    @Headers("Accept:application/json", "Content-Type:application/json;")
@@ -30,7 +25,7 @@ interface Api {
             @Field("Duration") Duration: Int?,
             @Field("IsRent") IsRent: Boolean?,
             @Field("IsOpen") IsOpen: Boolean?
-    ): Call<ArrayList<ResponseAPI>>
+    ): Call<ResponseAPI>
 
     @FormUrlEncoded
 //    @Headers("Accept:application/json", "Content-Type:application/json;")
@@ -43,6 +38,6 @@ interface Api {
             @Field("Duration") Duration: Int?,
             @Field("IsRent") IsRent: Boolean?,
             @Field("IsOpen") IsOpen: Boolean?
-    ): Call<ArrayList<ResponseAPI>>
+    ): Call<ResponseAPI>
 
 }
