@@ -27,7 +27,6 @@ import com.example.lockerbox.Room.LockerBox
 import com.example.lockerbox.Room.LockerBoxViewModel
 import com.example.lockerbox.Services.App
 import com.example.lockerbox.Services.BroadcastReceiver
-import com.example.lockerbox.Services.BroadcastReceiver.Companion.stopService
 import com.example.lockerbox.Services.LockerService
 import com.example.lockerbox.api.ResponseAPI
 import com.example.lockerbox.api.RetrofitClient
@@ -239,10 +238,12 @@ class HomeFragment : Fragment(), View.OnClickListener {
         }
 
         mDialogView.ButtonEnd.setOnClickListener {
-            finishRentBox(data)
-            deleteBox(data)
-            mAlertDialog.dismiss()
-            FinishRent()
+            if(LockerService.isRunning){
+                Log.d("p2", button_open.toString())
+                FinishRent()
+            }
+            finishRentBox(data, mAlertDialog)
+//            mAlertDialog.dismiss()
 //            button_stat = false
         }
     }
@@ -252,9 +253,10 @@ class HomeFragment : Fragment(), View.OnClickListener {
         LockerService.isaddTime = false
         LockerService.notifadd15 = false
 
+        LockerService.countDownTimer.cancel()
+
         serviceIntent = Intent(activity, LockerService::class.java)
-        serviceIntent.setAction(LockerService.ACTION_STOP_FOREGROUND_SERVICE)
-        requireActivity().startService(serviceIntent)
+        requireActivity().stopService(serviceIntent)
     }
 
     private fun wrongPasswordTimer(times: Long, mDialogView: View){
@@ -365,7 +367,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
         })
     }
 
-    private fun finishRentBox(data: LockerBox){
+    private fun finishRentBox(data: LockerBox, mAlertDialog: AlertDialog){
         RetrofitClient.instance.putBoxLocker(
                 data.idBox!!,
                 data.codeLocker,
@@ -381,7 +383,9 @@ class HomeFragment : Fragment(), View.OnClickListener {
             }
 
             override fun onFailure(call: Call<ArrayList<ResponseAPI>>, t: Throwable) {
+                deleteBox(data)
                 Toast.makeText(requireContext(), "Kamu sukses menselesaikan peminjaman Box nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+                mAlertDialog.dismiss()
             }
 
         })

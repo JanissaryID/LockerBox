@@ -125,6 +125,9 @@ class LockerService: Service() {
     }
 
     fun FinishRentHome(){
+        isRunning = false
+        isaddTime = false
+        notifadd15 = false
         countDownTimer.cancel()
         notificationManager.cancel(id_notification)
         Log.d("p2", "id stop $id_notification")

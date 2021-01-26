@@ -9,14 +9,6 @@ import com.example.lockerbox.MainActivity
 
 class BroadcastReceiver: BroadcastReceiver() {
 
-    companion object{
-        fun stopService(context: Context){
-            HomeFragment.serviceIntent = Intent(context, LockerService::class.java)
-            HomeFragment.serviceIntent.setAction(LockerService.ACTION_STOP_FOREGROUND_SERVICE)
-            context.startService(HomeFragment.serviceIntent)
-            Log.d("p2", "Stop Service")
-        }
-    }
 //    var myService: LockerService? = null
 
     override fun onReceive(p0: Context?, p1: Intent?) {
@@ -45,9 +37,9 @@ class BroadcastReceiver: BroadcastReceiver() {
         Log.d("p2", "Start Service")
     }
 
-//    fun stopService(context: Context){
-//        HomeFragment.serviceIntent = Intent(context, LockerService::class.java)
-//        context.stopService(HomeFragment.serviceIntent)
-//    }
+    fun stopService(context: Context){
+        HomeFragment.serviceIntent = Intent(context, LockerService::class.java)
+        context.stopService(HomeFragment.serviceIntent)
+    }
 
 }
