@@ -26,5 +26,8 @@ data class ResponseAPI(
 	val password: String? = null,
 
 	@field:SerializedName("IsOpen")
-	val isOpen: Boolean? = null
+	val isOpen: Boolean? = null,
+
+	@field:SerializedName("TimeOut")
+	val timeOut: Boolean? = null
 ) : Parcelable

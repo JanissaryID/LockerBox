@@ -14,6 +14,11 @@ interface Api {
         @Query("Password") Password: String?
     ): Call<List<ResponseAPI>>
 
+    @GET("lb/find/box")
+    fun getRentBox(
+            @Query("id") id: Int?
+    ): Call<List<ResponseAPI>>
+
     @FormUrlEncoded
 //    @Headers("Accept:application/json", "Content-Type:application/json;")
     @PUT("lb/{id}/")
@@ -24,7 +29,8 @@ interface Api {
             @Field("Password") Password: String?,
             @Field("Duration") Duration: Int?,
             @Field("IsRent") IsRent: Boolean?,
-            @Field("IsOpen") IsOpen: Boolean?
+            @Field("IsOpen") IsOpen: Boolean?,
+            @Field("TimeOut") TimeOut: Boolean?
     ): Call<ResponseAPI>
 
     @FormUrlEncoded
@@ -37,7 +43,8 @@ interface Api {
             @Field("Password") Password: String?,
             @Field("Duration") Duration: Int?,
             @Field("IsRent") IsRent: Boolean?,
-            @Field("IsOpen") IsOpen: Boolean?
+            @Field("IsOpen") IsOpen: Boolean?,
+            @Field("TimeOut") TimeOut: Boolean?
     ): Call<ResponseAPI>
 
 }

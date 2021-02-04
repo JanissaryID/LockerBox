@@ -1,5 +1,6 @@
 package com.example.lockerbox.Services
 
+import android.app.AlertDialog
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -9,11 +10,18 @@ import android.os.Binder
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.lockerbox.HomeFragment
 import com.example.lockerbox.MainActivity
 import com.example.lockerbox.R
 import com.example.lockerbox.Room.*
+import com.example.lockerbox.api.ResponseAPI
+import com.example.lockerbox.api.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LockerService: Service() {
 
@@ -53,8 +61,8 @@ class LockerService: Service() {
                     Log.d("p1", "Is Running " + isRunning.toString())
                     Log.d("p1", "Is Add time " + isaddTime.toString())
                     if(!isaddTime){
-//            App.time_in_milli_seconds = time!!.toLong() *20000L
-            App.time_in_milli_seconds = time!!.toLong() *3600000L
+            App.time_in_milli_seconds = time!!.toLong() *20000L
+//            App.time_in_milli_seconds = time!!.toLong() *3600000L
 //                        App.time_in_milli_seconds = time!!.toLong() *960000L
                     }
                     else{
@@ -120,6 +128,28 @@ class LockerService: Service() {
         StartForegroundnotif(foregroundvar = false)
         notificationtimeend()
         updateLockerBox()
+        timeOutRentBox()
+    }
+
+    private fun timeOutRentBox(){
+        RetrofitClient.instance.patchBoxLocker(
+                App.id,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                true
+        ).enqueue(object : Callback<ResponseAPI> {
+            override fun onResponse(call: Call<ResponseAPI>, response: Response<ResponseAPI>) {
+                Log.d("p3", "response up " + response.body().toString())
+            }
+
+            override fun onFailure(call: Call<ResponseAPI>, t: Throwable) {
+                Log.d("p3", "fail up " + t.message.toString())
+            }
+        })
     }
 
     fun FinishRentHome(){
@@ -180,7 +210,7 @@ class LockerService: Service() {
         val IntentBroadcast = PendingIntent.getBroadcast(applicationContext, 100, intentVar, 0)
 
 
-        if (Minute == 14 && !isaddTime && !notifadd15){
+        if ((Minute == 14 && Hour == 0) && !isaddTime && !notifadd15){
             notificationtime15()
             notifadd15 = true
             notification.addAction(

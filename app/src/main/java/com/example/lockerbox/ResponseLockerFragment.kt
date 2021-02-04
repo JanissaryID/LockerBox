@@ -35,6 +35,7 @@ class ResponseLockerFragment : Fragment() {
 
     private val args : ResponseLockerFragmentArgs by navArgs()
     private val list = ArrayList<ResponseAPI>()
+    private val listcheck = ArrayList<ResponseAPI>()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -133,12 +134,8 @@ class ResponseLockerFragment : Fragment() {
             }
 
             if(showerror){
-                updateBox(data, password, duration.subSequence(0, 1).toString().toInt(), mAlertDialog)
-//                insertDataToDB(data, password, duration.subSequence(0, 1).toString().toInt())
-//                val time = duration.subSequence(0, 1).toString().toInt()
-//                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + password + " dan " + duration, Toast.LENGTH_SHORT).show()
-//                startService(time, data.noBox!!)
-//                mAlertDialog.dismiss()
+                checkBox(data.id!!, data, password, duration.subSequence(0, 1).toString().toInt(), mAlertDialog)
+//                updateBox(data, password, duration.subSequence(0, 1).toString().toInt(), mAlertDialog)
             }
         }
     }
@@ -150,7 +147,7 @@ class ResponseLockerFragment : Fragment() {
         App.noBox = nobox
         HomeFragment.serviceIntent.setAction(LockerService.ACTION_START_FOREGROUND_SERVICE)
         requireActivity().startService(HomeFragment.serviceIntent)
-        Toast.makeText(requireContext(), "Service Start", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(requireContext(), "Service Start", Toast.LENGTH_SHORT).show()
     }
 
     private fun insertDataToDB(data: ResponseAPI, datapassword: String, dataduration: Int) {
@@ -179,6 +176,31 @@ class ResponseLockerFragment : Fragment() {
         return !(TextUtils.isEmpty(Password) || TextUtils.isEmpty(Time))
     }
 
+    private fun checkBox(idBox : Int, data: ResponseAPI, password: String, duration: Int, mAlertDialog: AlertDialog){
+        RetrofitClient.instance.getRentBox(idBox).enqueue(object : Callback<List<ResponseAPI>> {
+            override fun onResponse(call: Call<List<ResponseAPI>>, response: Response<List<ResponseAPI>>) {
+                Log.d("p4", "response up " + response.body().toString())
+                response.body()?.let { listcheck.addAll(it) }
+                Log.d("p4", "id ${listcheck[0].noBox}")
+                Log.d("p4", "isRent ${listcheck[0].isRent}")
+                if(!listcheck[0].isRent!!){
+                    updateBox(data, password, duration, mAlertDialog)
+                }
+                else{
+                    Toast.makeText(requireContext(), "Box Sudah Tersewa", Toast.LENGTH_SHORT).show()
+                    mAlertDialog.dismiss()
+                    list.clear()
+                    listcheck.clear()
+                    getdata()
+                }
+            }
+
+            override fun onFailure(call: Call<List<ResponseAPI>>, t: Throwable) {
+                Log.d("p4", "fail up " + t.message.toString())
+            }
+        })
+    }
+
     private fun updateBox(data: ResponseAPI, datapassword: String, dataduration: Int, mAlertDialog: AlertDialog){
         RetrofitClient.instance.patchBoxLocker(
                 data.id!!,
@@ -187,13 +209,14 @@ class ResponseLockerFragment : Fragment() {
                 datapassword,
                 dataduration,
                 true,
+                null,
                 null
         ).enqueue(object : Callback<ResponseAPI> {
             override fun onResponse(call: Call<ResponseAPI>, response: Response<ResponseAPI>) {
                 Log.d("p2", response.body().toString())
                 insertDataToDB(data, datapassword, dataduration)
                 val time = dataduration
-                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + datapassword + " dan " + dataduration, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(requireContext(), "Kamu sukses memasukkan " + datapassword + " dan " + dataduration, Toast.LENGTH_SHORT).show()
                 startService(time, data.noBox!!)
                 mAlertDialog.dismiss()
             }

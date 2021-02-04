@@ -320,10 +320,12 @@ class HomeFragment : Fragment(), View.OnClickListener {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         ).enqueue(object : Callback<ResponseAPI>{
             override fun onResponse(call: Call<ResponseAPI>, response: Response<ResponseAPI>) {
-                Toast.makeText(requireContext(), "Kamu sukses membuka pintu nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Kamu berhasil membuka pintu nomor ${data.noBox}" , Toast.LENGTH_SHORT).show()
+                wrongPassword = 3
                 mAlertDialog.dismiss()
             }
 
@@ -346,6 +348,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
                 data.noBox,
                 "", //nanti di clear password jangan lupa!!
                 0,
+                false,
                 false,
                 false
         ).enqueue(object : Callback<ResponseAPI>{
@@ -370,7 +373,7 @@ class HomeFragment : Fragment(), View.OnClickListener {
 
     private fun deleteBox(data: LockerBox){
         LockerService.mLockerBoxViewModel.deleteLockerBox(data)
-        Toast.makeText(requireContext(), "Kamu sukses menghapus data dari DB", Toast.LENGTH_LONG).show()
+//        Toast.makeText(requireContext(), "Kamu sukses menghapus data dari DB", Toast.LENGTH_LONG).show()
     }
 
 }
